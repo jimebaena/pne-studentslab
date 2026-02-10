@@ -1,4 +1,9 @@
 The error is in line 8, there is a division by 0 which is undefined, this is because t1 which is calculated in line 7 returns 0
-This error is given with result 2 but not with the first result, as the program stops and gives the error when it has already calculated result 1, but finds an error in result 2
-To find if an error is given with result 3 and 4, I eliminated the print of result 2 which was given the error, now, the complete program works and gives the answer to Result 1, Result 3 and Result 4
+This error is given with result 2, line 14, but not with the first result, as the program stops and gives the error when it has already calculated result 1, line 13, but finds an error in result 2
+To find if an error is given with result 3, line 15, and Result 4, line 16, I comment the line 14, that has the result 2, which was given the error, now, the complete program works and gives the answer to Result 1, Result 3 and Result 4
 As a result, we know the error of the program is only caused by Result 2, as t1 gives 0.
+
+The error is located in line 11. Its type is ZeroDivisionError, and its caused when the value of "t1" is 0.
+This will happen anytime parameters c and d of the function f take the same value
+
+Another way is establishing a breakpoint in line 6, t0, to see with the bug, step by step, using step over we get that the Result 1 is perfectly correct calculated but the problem comes when trying to calculate t3, with result 2, that gives t1 equal 0
