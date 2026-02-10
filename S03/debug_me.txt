@@ -1,0 +1,4 @@
+The error is in line 8, there is a division by 0 which is undefined, this is because t1 which is calculated in line 7 returns 0
+This error is given with result 2 but not with the first result, as the program stops and gives the error when it has already calculated result 1, but finds an error in result 2
+To find if an error is given with result 3 and 4, I eliminated the print of result 2 which was given the error, now, the complete program works and gives the answer to Result 1, Result 3 and Result 4
+As a result, we know the error of the program is only caused by Result 2, as t1 gives 0
