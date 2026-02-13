@@ -20,3 +20,7 @@ for mark in grades.values():
     total += mark
     total_subjects += 1
 print("The average grade is:", round(total / total_subjects, 2))
+
+print("Subject grades:")
+for subject, mark in grades.items():
+    print("-", subject, ":", mark)
