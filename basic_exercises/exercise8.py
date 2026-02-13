@@ -23,10 +23,10 @@ for p in students:
     name = p["name"]
     average_mark = round(average(grades_list), 1)
     if average_mark >= 5:
-        print(name, ":", round(average(grades_list), 1), "-> PASS")
+        print(name, ":", average_mark, "-> PASS")
         total_pass += 1
     else:
-        print(name, ":", round(average(grades_list), 1), "-> FAIL")
+        print(name, ":", average_mark, "-> FAIL")
         total_fail += 1
 
 print("\nResults:", total_pass, "passed,", total_fail, "failed")
