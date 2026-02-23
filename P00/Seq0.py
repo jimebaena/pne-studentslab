@@ -44,3 +44,15 @@ def seq_complement(seq):
         complement_seq += complement_map.get(base, base)
 
     return complement_seq
+
+def frequency(seq):
+    bases = {'A': 0, 'T': 0, 'C': 0, 'G': 0}
+    for base in seq:
+        bases[base] += 1
+    highest = 0
+    base_name = ""
+    for base in seq:
+        if bases[base] > highest:
+            highest = bases[base]
+            base_name = base
+    return base_name
