@@ -7,7 +7,6 @@ class Seq:
             if letter in all:
                 total += 1
         if total == len(bases):
-            # Cambiado a un solo '!' para coincidir con el enunciado
             print("New sequence created!")
             self.bases = bases
         else:
