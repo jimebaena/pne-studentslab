@@ -1,3 +1,4 @@
+from pathlib import Path
 class Seq:
     def __init__(self, bases=""):
         self.bases = bases
@@ -57,3 +58,24 @@ class Seq:
             elif letter == "G":
                 new += "C"
         return new
+
+    def read_fasta(self, filename):
+        try:
+            file_contents = Path(filename).read_text()
+            t = file_contents.find("\n")
+            sequence = file_contents[t:].replace("\n", "").strip()
+            self.__init__(sequence) #volvemos a llamar al iniciador
+
+        except FileNotFoundError:
+            print(f"Error: file not found {filename}")
+            self.bases = "ERROR"
+
+    def get_most_frequent(self):
+        counts = self.count_base()
+        max_base = ""
+        max_value = -1
+        for base in counts:
+            if counts[base] > max_value:
+                max_value = counts[base]
+                max_base = base
+        return max_base
