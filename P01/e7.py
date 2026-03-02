@@ -1,16 +1,15 @@
 from Seq1 import Seq
-
-print("-----| Practice 1, Exercise 5 |------")
+print("-----| Practice 1, Exercise 7 |------")
 
 s1 = Seq()
 s2 = Seq("ACTGA")
 s3 = Seq("Invalid")
 
 sequences = [s1, s2, s3]
-
 i = 0
+
 for s in sequences:
     print(f"Sequence {i}: (Length: {s.len()}) {s}")
-    counts = s.count_base()
-    print(f"  A: {counts['A']},   C: {counts['C']},   T: {counts['T']},   G: {counts['G']}")
+    print(f"  Bases: {s.count_base()}")
+    print(f"  Rev:   {s.reverse()}")
     i += 1

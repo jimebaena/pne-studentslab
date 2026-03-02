@@ -28,12 +28,32 @@ class Seq:
     def __str__(self):
         return self.bases
 
-    def count_base(self, bases):
-        self.bases = bases
+    def count_base(self):
         all_bases = {"A": 0, "C": 0, "G": 0, "T": 0}
         if self.bases == "NULL" or self.bases == "ERROR":
             return all_bases
         else:
-            for letter in bases:
+            for letter in self.bases:
                 all_bases[letter] += 1
             return all_bases
+
+    def reverse(self):
+        if self.bases == "NULL" or self.bases == "ERROR":
+            return self.bases
+        else:
+            return self.bases[::-1]
+
+    def complement(self):
+        if self.bases == "NULL" or self.bases == "ERROR":
+            return self.bases
+        new = ""
+        for letter in self.bases:
+            if letter == "A":
+                new += "T"
+            elif letter == "T":
+                new += "A"
+            elif letter == "C":
+                new += "G"
+            elif letter == "G":
+                new += "C"
+        return new
