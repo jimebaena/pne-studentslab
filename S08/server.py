@@ -1,37 +1,44 @@
 import socket
 
-# 1. Configuración: Pon AQUÍ la IP de tu ordenador (la que sale en ipconfig)
-# Si estás en casa probando solo, puedes usar "127.0.0.1"
-IP = "192.168.1.XX"
+IP = "127.0.0.1"
 PORT = 8081
+MAX_OPEN_REQUESTS = 5
 
-# 2. Crear el socket del servidor
-ls = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# Counter for tracking how many people connected
+number_con = 0
 
-# 3. "Bind": Reservar la IP y el Puerto para nosotros
-ls.bind((IP, PORT))
+serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-# 4. "Listen": Empezar a escuchar (máximo 5 personas en espera)
-ls.listen(5)
+try:
+    # Bind the socket to your specific IP and Port
+    serversocket.bind((IP, PORT))
 
-print(f"--- Server is ready and listening on {IP}:{PORT} ---")
+    # Start listening for incoming connections
+    serversocket.listen(MAX_OPEN_REQUESTS)
 
-while True:
-    # 5. "Accept": El programa se para aquí hasta que alguien se conecta
-    # conn es el cable para hablar con el cliente, addr es su dirección
-    conn, addr = ls.accept()
+    print(f"--- Server is running at {IP}:{PORT} ---")
 
-    # 6. Recibir los datos (paquete de máximo 2048 bytes)
-    data = conn.recv(2048)
+    while True:
+        print("Waiting for a new connection...")
+        (clientsocket, address) = serversocket.accept()
 
-    # 7. Si no nos han mandado nada, cerramos y esperamos al siguiente
-    if not data:
-        conn.close()
-        continue
+        # Increment connection counter
+        number_con += 1
+        print(f"CONNECTION {number_con}: Received from {address}")
 
-    # 8. Decodificar los bytes a texto y mostrarlo
-    message = data.decode()
-    print(f"Message from {addr[0]}: {message}")
+        data = clientsocket.recv(2048)
+        message = data.decode("utf-8")
+        print(f"Client says: {message}")
 
-    # 9. Importante: Cerrar la conexión con ese cliente concreto
-    conn.close()
+        response = "Hello! I have received your message successfully.\n"
+        clientsocket.send(response.encode("utf-8"))
+
+        clientsocket.close()
+        print(f"Connection {number_con} closed.\n")
+
+except socket.error:
+    print(f"Error: Could not use IP {IP} or Port {PORT}. Check your IP address!")
+
+except KeyboardInterrupt:
+    print("\nServer stopped by the user.")
+    serversocket.close()
