@@ -22,3 +22,4 @@ print(msg.decode("utf-8"))
 
 # Closing the socket
 s.close()
+

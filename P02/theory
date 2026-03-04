@@ -1,0 +1,40 @@
+
+Running Client and Server Together
+
+- EASY FORM:
+
+    1. Right-click server.py and select Run.
+
+    2. You will see a tab named server appear in the Run tool window at the bottom. Right-click that tab and select Pin Tab.
+
+    3. Now, run e3.py. PyCharm will open a new tab next to it without closing the server tab.
+
+- WITH TERMINALS:
+
+1. Pre-Execution Configuration
+
+Before running any code, verify these two constants in your Python files:
+
+    IP Address: Set to "127.0.0.1" in both files.
+
+    Port: Set to 8081 in both the server and the client to ensure they use the same "window."
+
+2. The Step-by-Step Process
+
+You must use two separate terminal windows to keep both programs running at the same time.
+
+Terminal 1: The Server (The Receiver)
+
+    Navigate: Use cd followed by the folder path (e.g., cd S08).
+
+    Run: Execute the command python3 server.py.
+
+    Status: The terminal will show a message like "Waiting for connections...".
+
+Terminal 2: The Client (The Sender)
+
+    Navigate: Open a new terminal and use cd to enter the client's folder (e.g., cd P02).
+
+    Run: Execute the command python3 e3.py.
+
+    Result: You should see the message being sent and the server's response appearing in this window.
