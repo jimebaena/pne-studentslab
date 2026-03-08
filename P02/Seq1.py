@@ -30,16 +30,8 @@ class Seq:
         return self.bases
 
     def count_base(self):
-        all_bases = {"A": 0, "C": 0, "G": 0, "T": 0}
-        if self.bases == "NULL" or self.bases == "ERROR":
-            return all_bases
-
-        for letter in self.bases:
-            if letter in all_bases:
-                all_bases[letter] += 1
-        return all_bases
-
-    def complement(self):
+        f
+        complement(self):
         if self.bases == "NULL" or self.bases == "ERROR":
             return self.bases
         new = ""
