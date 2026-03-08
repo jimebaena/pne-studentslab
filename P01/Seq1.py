@@ -74,13 +74,6 @@ class Seq:
                 max_value = counts[base]
                 max_base = base
         return max_base
-        all_bases = {"A": 0, "C": 0, "G": 0, "T": 0}
-        if self.bases == "NULL" or self.bases == "ERROR":
-            return all_bases
-        else:
-            for letter in self.bases:
-                all_bases[letter] += 1
-            return all_bases
 
     def reverse(self):
         if self.bases == "NULL" or self.bases == "ERROR":

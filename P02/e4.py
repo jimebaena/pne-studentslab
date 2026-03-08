@@ -1,34 +1,32 @@
 from Client0 import Client
+from Seq1 import Seq
 
 PRACTICE = 2
 EXERCISE = 4
+
 print(f"-----| Practice {PRACTICE}, Exercise {EXERCISE} |------")
 
 IP = "127.0.0.1"
 PORT = 8081
 FOLDER = "sequences/"
+genes = ["U5", "ADA", "FRAT1", "FXN", "RNU6_269P"]
 
-genes_to_send = ["U5", "FRAT1", "ADA"]
 
 c = Client(IP, PORT)
 
-for gene_name in genes_to_send:
-    s = Client()
-    filename = f"{gene_name}.txt"
-    full_path = FOLDER + filename
+for gene_name in genes:
+    s = Seq()
+    s.read_fasta(f"{FOLDER}{gene_name}.txt")
 
-    try:
-        s.read_fasta(full_path)
+    msg_intro = f"Sending {gene_name} Gene to the server..."
 
-        print(f"Sending the {gene_name} Gene to the server...")
 
-        # Enviamos la secuencia al servidor
-        # str(s) convierte tu objeto Seq en la cadena de bases (A, C, T, G)
-        response = c.talk(str(s))
+    print(f"To Server: {msg_intro}")
+    response1 = c.talk(msg_intro)
+    print(f"From Server: {response1}\n")
 
-        print(f"Response: {response}")
+    print(f"To Server: {str(s)}")
+    response2 = c.talk(str(s))
+    print(f"From Server: {response2}\n")
 
-    except FileNotFoundError:
-        print(f"Error: No se encuentra el archivo en {full_path}")
-
-print("\nAll genes sent successfully!")
+print("\nProcess finished successfully.")
