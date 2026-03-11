@@ -15,5 +15,3 @@ for i in range(5):
     print(f"To Server: {message}")
     print(f"From Server: {response}")
     print("")
-
-print("Process finished with exit code 0")
