@@ -17,7 +17,11 @@ def process_client(s):
     req_line = lines[0]
     get_info = req_line.split(" ")
     if len(get_info) > 1:
-        if get_info[1] == "/info/G":
+        if get_info[1] == "/info/A":
+            body = Path("html/info/A.html").read_text()
+        elif get_info[1] == "/info/C":
+            body = Path("html/info/C.html").read_text()
+        elif get_info[1] == "/info/G":
             body = Path("html/info/G.html").read_text()
         elif get_info[1] == "/info/T":
             body = Path("html/info/T.html").read_text()

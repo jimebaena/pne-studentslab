@@ -21,8 +21,12 @@ def process_client(s):
             body = Path("html/info/A.html").read_text()
         elif get_info[1] == "/info/C":
             body = Path("html/info/C.html").read_text()
+        elif get_info[1] == "/info/G":
+            body = Path("html/info/G.html").read_text()
+        elif get_info[1] == "/info/T":
+            body = Path("html/info/T.html").read_text()
         else:
-            body = " "
+            body = Path("html/info/error.html").read_text()
 
     print("Request line: ", end="")
     termcolor.cprint(req_line, "green")
