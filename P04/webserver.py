@@ -34,7 +34,7 @@ def process_client(s):
         elif path == "/info/T":
             body = Path("html/info/T.html").read_text()
         else:
-            body = Path("html/info/error.html").read_text()
+            body = Path("html/error.html").read_text()
 
     print("Request line: ", end="")
     termcolor.cprint(req_line, "green")
