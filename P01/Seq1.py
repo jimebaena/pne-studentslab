@@ -54,6 +54,17 @@ class Seq:
                 new += "C"
         return new
 
+   #other option for complement
+    def complement2(self):
+        if self.bases == "NULL" or self.bases == "ERROR":
+            return self.bases
+        complement_bases = { "A": "T", "C": "G", "G": "C", "T": "A"}
+        new_seq = ""
+        for letter in self.bases:
+            comp = complement_bases.get(letter)
+            new_seq += comp
+        return new_seq
+
     def read_fasta(self, filename):
         try:
             file_contents = Path(filename).read_text()

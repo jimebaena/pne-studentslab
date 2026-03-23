@@ -1,3 +1,4 @@
+
 class Seq:
     """A class for representing sequences"""
     pass
@@ -14,4 +15,6 @@ class ClassName:
         # Perform operations on attributes or other tasks
         pass
 
-    
+
+import termcolor
+termcolor.cprint("This is sentence is in yellow", "yellow")
