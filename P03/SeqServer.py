@@ -19,6 +19,10 @@ while True:
     msg_raw = cs.recv(2048)
     request = msg_raw.decode().strip()
     divided = request.split(" ", 1)
+
+    info = "" #necesario para que llegue al error si por ejemplo meten "HOLA" y no de fallo porque no tenga definido esa palabra un info y command
+    command = ""
+
     if len(divided) == 2:
         info = divided[1]
         command = divided[0]
