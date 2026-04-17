@@ -68,6 +68,26 @@ class EchoHandler(http.server.BaseHTTPRequestHandler):
                 contents = "Error: Introduce a valid number."
                 self.send_response(404)
 
+        elif path == "/gene":
+            params = parse_qs(parsed_url.query)
+            gene_name = params.get('genes', [''])[0]
+
+            gene_path = Path(f"../sequences/{gene_name}.txt")
+            data = gene_path.read_text()
+            t = data.find("\n")
+            sequence = data[t:].replace("\n", "").strip()
+
+            def read_html_file(filename):
+                contents = Path("html/" + filename).read_text()
+                contents = j.Template(contents)
+                return contents
+
+            template = read_html_file("gene.html")
+            contents = template.render(info={"name": gene_name, "seq": sequence})
+
+            self.send_response(200)
+
+
         else:
             contents = Path('html/error.html').read_text()
 
