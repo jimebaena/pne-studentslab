@@ -87,6 +87,70 @@ class EchoHandler(http.server.BaseHTTPRequestHandler):
 
             self.send_response(200)
 
+        elif path == "/operation":
+            params = parse_qs(parsed_url.query)
+            seq = params.get('msg', [''])[0].upper()
+            op = params.get('operation', [''])[0]
+
+            result = ""
+            length = len(seq)
+
+            valid = "ACGT"
+            total = 0
+
+            for base in seq:
+                if base in valid:
+                    total += 1
+            if total != length:
+                result = "Invalid sequence"
+
+            elif op == "Info":
+                if length > 0:
+                    a = seq.count('A')
+                    c = seq.count('C')
+                    g = seq.count('G')
+                    t = seq.count('T')
+
+                    p_a = (a / length) * 100
+                    p_c = (c / length) * 100
+                    p_g = (g / length) * 100
+                    p_t = (t / length) * 100
+
+                    result = (f"Total length: {length} <br> "
+                              f"A: {a} ({p_a:.1f}%) <br> "
+                              f"C: {c} ({p_c:.1f}%) <br> "
+                              f"G: {g} ({p_g:.1f}%) <br> "
+                              f"T: {t} ({p_t:.1f}%) <br>")
+                else:
+                    result = "Empty sequence"
+
+            elif op == "Comp":
+                complement_seq = ""
+                for base in seq:
+                    if base == 'A':
+                        complement_seq += 'T'
+                    elif base == 'T':
+                        complement_seq += 'A'
+                    elif base == 'C':
+                        complement_seq += 'G'
+                    elif base == 'G':
+                        complement_seq += 'C'
+
+                result = complement_seq
+            elif op == "Rev":
+                result = seq[::-1]
+
+            def read_html_file(filename):
+                contents = Path("html/" + filename).read_text()
+                return j.Template(contents)
+
+            template = read_html_file("operation.html")
+            contents = template.render(info={
+                "seq": seq,
+                "op": op,
+                "res": result
+            })
+            self.send_response(200)
 
         else:
             contents = Path('html/error.html').read_text()

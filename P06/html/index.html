@@ -22,6 +22,7 @@
         <option value="4">4</option>
       </select>
       <input type="submit" value="GET"></p>
+      <hr>
     </form>
     <form action="gene" method="get">
       <p>Get a gene. Select the name
@@ -33,8 +34,19 @@
         <option value="U5">U5</option>
       </select>
       <input type="submit" value="GENE"></p>
+      <hr>
     </form>
-
-
+    <form action="operation" method="get">
+      Write a sequence:  <input type="text" name="msg">
+      <br><br>
+      Select operation
+      <input type="radio" name="operation" value="Info" checked> Info
+      <input type="radio" name="operation" value="Comp"> Comp
+      <input type="radio" name="operation" value="Rev"> Rev
+        <br><br>
+      <p>Perform operation:
+        <input type="submit" value="OPERATE!"/></p>
+      <hr>
+    </form>
   </body>
 </html>
