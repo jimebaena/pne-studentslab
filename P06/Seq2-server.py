@@ -73,9 +73,7 @@ class EchoHandler(http.server.BaseHTTPRequestHandler):
             gene_name = params.get('genes', [''])[0]
 
             gene_path = Path(f"../sequences/{gene_name}.txt")
-            data = gene_path.read_text()
-            t = data.find("\n")
-            sequence = data[t:].replace("\n", "").strip()
+            sequence = gene_path.read_text()
 
             def read_html_file(filename):
                 contents = Path("html/" + filename).read_text()
