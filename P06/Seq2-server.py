@@ -10,6 +10,11 @@ PORT = 8081
 socketserver.TCPServer.allow_reuse_address = True
 
 
+def read_html_file(filename):
+    contents = Path("html/" + filename).read_text()
+    contents = j.Template(contents)
+    return contents
+
 class EchoHandler(http.server.BaseHTTPRequestHandler):
 
     def do_GET(self):
@@ -55,11 +60,6 @@ class EchoHandler(http.server.BaseHTTPRequestHandler):
 
                 seq = sequences.get(n, "Seq not found")
 
-                def read_html_file(filename):
-                    contents = Path("html/" + filename).read_text()
-                    contents = j.Template(contents)
-                    return contents
-
                 contents = read_html_file("get.html").render(info={"seq" : seq, "num" : n})
                 self.send_response(200)
 
@@ -75,10 +75,6 @@ class EchoHandler(http.server.BaseHTTPRequestHandler):
             gene_path = Path(f"../sequences/{gene_name}.txt")
             sequence = gene_path.read_text()
 
-            def read_html_file(filename):
-                contents = Path("html/" + filename).read_text()
-                contents = j.Template(contents)
-                return contents
 
             template = read_html_file("gene.html")
             contents = template.render(info={"name": gene_name, "seq": sequence})
@@ -138,9 +134,6 @@ class EchoHandler(http.server.BaseHTTPRequestHandler):
             elif op == "Rev":
                 result = seq[::-1]
 
-            def read_html_file(filename):
-                contents = Path("html/" + filename).read_text()
-                return j.Template(contents)
 
             template = read_html_file("operation.html")
             contents = template.render(info={
