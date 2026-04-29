@@ -61,8 +61,9 @@ class GenomeHandler(http.server.BaseHTTPRequestHandler):
                     })
                     self.send_response(200)
                 else:
-                    contents = "<h1>Error connecting to Ensembl</h1>"
-                    self.send_response(500)
+                    self.send_response(404)
+                    contents = Path('html/error.html').read_text()
+
             except Exception as e:
                 contents = f"<h1>Internal Error: {e}</h1>"
                 self.send_response(500)
@@ -72,8 +73,8 @@ class GenomeHandler(http.server.BaseHTTPRequestHandler):
             species = params.get('species', [''])[0]
 
             if not species:
-                contents = "<h1>Error: No species specified</h1>"
-                self.send_response(400)
+                self.send_response(404)
+                contents = Path('html/error.html').read_text()
             else:
                 url = f"https://rest.ensembl.org/info/assembly/{species}"
                 try:
@@ -99,8 +100,8 @@ class GenomeHandler(http.server.BaseHTTPRequestHandler):
                         })
                         self.send_response(200)
                     else:
-                        contents = f"<h1>Error: Species '{species}' not found</h1>"
                         self.send_response(404)
+                        contents = Path('html/error.html').read_text()
                 except Exception as e:
                     contents = f"<h1>Internal Error: {e}</h1>"
                     self.send_response(500)
