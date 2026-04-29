@@ -68,6 +68,7 @@ class GenomeHandler(http.server.BaseHTTPRequestHandler):
                 contents = f"<h1>Internal Error: {e}</h1>"
                 self.send_response(500)
 
+
         elif path == "/karyotype":
             params = parse_qs(parsed_url.query)
             species = params.get('species', [''])[0]
@@ -76,7 +77,45 @@ class GenomeHandler(http.server.BaseHTTPRequestHandler):
                 self.send_response(404)
                 contents = Path('html/error.html').read_text()
             else:
-                url = f"https://rest.ensembl.org/info/assembly/{species}"
+                url = f"https://rest.ensembl.org/info/assembly/{species.replace(' ', '%20')}"
+
+                try:
+                    response = requests.get(url, headers={"Content-Type": "application/json"})
+
+                    if response.status_code == 200:
+                        data = response.json()
+
+                        karyotypes = data.get('karyotype', [])
+
+                        karyotype_html = ""
+                        for chromo in karyotypes:
+                            karyotype_html += f"<li>{chromo}</li>"
+
+                        template = read_html_file("karyotype.html")
+                        contents = template.render(info={
+                            "list": karyotype_html
+                        })
+                        self.send_response(200)
+                    else:
+                        self.send_response(404)
+                        contents = Path('html/error.html').read_text()
+
+                except Exception as e:
+                    self.send_response(500)
+                    contents = f"<h1>Internal Error: {e}</h1>"
+
+
+        elif path == "/chromosomeLength":
+            params = parse_qs(parsed_url.query)
+            species = params.get('species', [''])[0]
+            chromo = params.get('chromo', [''])[0]
+
+            if not species or not chromo:
+                self.send_response(404)
+                contents = Path('html/error.html').read_text()
+
+            else:
+                url = f"https://rest.ensembl.org/info/assembly/{species.replace(" ", "%20")}"
                 try:
                     response = requests.get(url, headers={"Content-Type": "application/json"})
 
@@ -84,28 +123,28 @@ class GenomeHandler(http.server.BaseHTTPRequestHandler):
                         data = response.json()
                         regions = data.get('top_level_region', [])
 
-                        karyotype_list = []
+                        found_length = ""
+
                         for region in regions:
-                            if region.get('coord_system') == 'chromosome':
-                                karyotype_list.append(region.get('name'))
+                            if region.get('name') == chromo and region.get('coord_system') == 'chromosome':
+                                found_length = region.get('length')
 
-                        karyotype_html = ""
-                        for chromo in karyotype_list:
-                            karyotype_html += f"<li>{chromo}</li>"
-
-                        template = read_html_file("karyotype.html")
-                        contents = template.render(info={
-                            "species": species,
-                            "list": karyotype_html
-                        })
-                        self.send_response(200)
+                        if found_length != "":
+                            template = read_html_file("chromolength.html")
+                            contents = template.render(info={
+                                "length": found_length
+                            })
+                            self.send_response(200)
+                        else:
+                            self.send_response(404)
+                            contents = Path('html/error.html').read_text()
                     else:
                         self.send_response(404)
                         contents = Path('html/error.html').read_text()
-                except Exception as e:
-                    contents = f"<h1>Internal Error: {e}</h1>"
-                    self.send_response(500)
 
+                except Exception as e:
+                    self.send_response(500)
+                    contents = f"<h1>Internal Error: {e}</h1>"
         else:
             try:
                 contents = Path('html/error.html').read_text()

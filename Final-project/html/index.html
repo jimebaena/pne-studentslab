@@ -10,19 +10,21 @@
     <p>1) List of all species in the genome database</p>
     <form action="/listSpecies" method="get">
       Limit:  <input type="text" name="limit">
+      <br><br>
         <input type="submit" value="Send"/>
     </form>
     <p>2) Information about the karyotype:</p>
     <form action="/karyotype" method="get">
       Select the species:  <input type="text" name="species">
+      <br><br>
         <input type="submit" value="Send"/>
     </form>
     <p>3) Chromosome Length</p>
     <form action="/chromosomeLength" method="get">
-      Select the species:  <input type="text" name="msg">
-        <input type="submit" value="Send"/>
+      Select the species:  <input type="text" name="species">
        <br><br>
-        Select a chromosome:  <input type="text" name="msg">
+        Select a chromosome:  <input type="text" name="chromo">
+      <br><br>
         <input type="submit" value="Send"/>
     </form>
 
