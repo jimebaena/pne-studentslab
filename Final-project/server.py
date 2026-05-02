@@ -145,6 +145,39 @@ class GenomeHandler(http.server.BaseHTTPRequestHandler):
                 except Exception as e:
                     self.send_response(500)
                     contents = f"<h1>Internal Error: {e}</h1>"
+
+
+        elif path == "/geneLookup":
+            params = parse_qs(parsed_url.query)
+            gene_name = params.get('gene', [''])[0]
+
+            if not gene_name:
+                self.send_response(404)
+                contents = Path('html/error.html').read_text()
+            else:
+                url = f"https://rest.ensembl.org/lookup/symbol/homo_sapiens/{gene_name}"
+
+                try:
+                    response = requests.get(url, headers={"Content-Type": "application/json"})
+
+                    if response.status_code == 200:
+                        data = response.json()
+
+                        ensembl_id = data.get('id')
+
+                        template = read_html_file("genelookup.html")
+                        contents = template.render(info={
+                            "gene": gene_name,
+                            "id": ensembl_id
+                        })
+                        self.send_response(200)
+                    else:
+                        self.send_response(404)
+                        contents = Path('html/error.html').read_text()
+
+                except Exception as e:
+                    self.send_response(500)
+                    contents = f"<h1>Internal Error: {e}</h1>"
         else:
             try:
                 contents = Path('html/error.html').read_text()
