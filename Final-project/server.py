@@ -312,6 +312,48 @@ class GenomeHandler(http.server.BaseHTTPRequestHandler):
                     self.send_response(500)
                     contents = f"<h1>Internal Error: {e}</h1>"
 
+        elif path == "/geneList":
+            params = parse_qs(parsed_url.query)
+            chromo = params.get('chromo', [''])[0]
+            start = params.get('start', [''])[0]
+            end = params.get('end', [''])[0]
+
+            if not chromo or not start or not end:
+                self.send_response(404)
+                contents = Path('html/error.html').read_text()
+            else:
+                url = f"https://rest.ensembl.org/overlap/region/human/{chromo}:{start}-{end}?feature=gene;feature=transcript;feature=cds;feature=exon;"
+
+                try:
+                    response = requests.get(url, headers={"Content-Type": "application/json"})
+
+                    if response.status_code == 200:
+                        data = response.json()
+
+                        gene_names = []
+                        for dic in data:
+                            gene_names.append({dic.get("external_name", "No Name"): dic.get("id")})
+
+                        genes_html = ""
+                        for dic in gene_names:
+                            for k, v in dic.items():
+                                genes_html += f"<li>{k}: {v}</li>"
+
+                        template = read_html_file("geneList.html")
+                        contents = template.render(info={
+                            "genes_names": genes_html,
+                            "chromo": chromo
+                        })
+                        self.send_response(200)
+
+                    else:
+                        self.send_response(404)
+                        contents = Path('html/error.html').read_text()
+
+                except Exception as e:
+                    self.send_response(500)
+                    contents = f"<h1>Internal Error: {e}</h1>"
+
         else:
             try:
                 contents = Path('html/error.html').read_text()
