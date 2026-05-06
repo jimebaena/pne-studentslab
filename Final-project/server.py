@@ -281,9 +281,7 @@ class GenomeHandler(http.server.BaseHTTPRequestHandler):
                         url2 = f"https://rest.ensembl.org/sequence/id/{ensembl_id}"
                         response2 = requests.get(url2, headers={"Content-Type": "application/json"})
                         data2 = response2.json()
-                        seq = data2.get("seq")
-                        remove = seq.find("\n")
-                        clean_seq = seq[remove:]
+                        clean_seq = data2.get("seq")
                         length = len(clean_seq)
                         bases = {"A": 0, "T": 0, "C": 0, "G": 0}
                         for t in clean_seq:
@@ -295,7 +293,7 @@ class GenomeHandler(http.server.BaseHTTPRequestHandler):
                         cytosine = round((bases["C"] / length) * 100, 2)
                         guanine = round((bases["G"] / length) * 100, 2)
 
-                        template = read_html_file("geneseq.html")
+                        template = read_html_file("genecalc.html")
                         contents = template.render(info={
                             "gene": gene_name,
                             "length": length,
