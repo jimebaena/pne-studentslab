@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LIST OF SPECIES IN THE BROWSER</title>
+</head>
+<body style="background-color: lightpink">
+    <p>The total number of species in the ensembl is : {{ info.total }}</p>
+    <p>The limit you have selected is : {{ info.limit }}</p>
+    <p>The names of the species are : </p>
+    <ul>
+        {{ info.list }}
+    </ul>
+    <p><a href="/">Main page</a></p>
+</body>
+</html>

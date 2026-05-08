@@ -4,7 +4,6 @@ import requests
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 import jinja2 as j
-import json
 
 PORT = 8080
 
@@ -31,7 +30,6 @@ class GenomeHandler(http.server.BaseHTTPRequestHandler):
         elif path == "/listSpecies":
             params = parse_qs(parsed_url.query)
             limit_val = params.get('limit', [''])[0]
-            is_json = params.get('json', ['0'])[0] == '1'
 
             url = "https://rest.ensembl.org/info/species"
             try:
@@ -51,43 +49,29 @@ class GenomeHandler(http.server.BaseHTTPRequestHandler):
                     else:
                         display_limit = "All"
 
-                    result_data = {
-                        "limit": display_limit,
+                    especies_html = ""
+                    for n in names:
+                        especies_html += f"<li>{n}</li>"
+
+                    template = read_html_file("list.html")
+                    contents = template.render(info={
+                        "list": especies_html,
                         "total": total_species,
-                        "species": names
-                    }
-
-                    if is_json:
-                        # MODE A: JSON Response
-                        self.send_response(200)
-                        contents = json.dumps(result_data)
-                    else:
-                        # MODE B: HTML Response
-                        # We build the <li> tags for the template
-                        especies_html = ""
-                        for n in names:
-                            especies_html += f"<li>{n}</li>"
-
-                        template = read_html_file("list.html")
-                        contents = template.render(info={
-                            "list": especies_html,
-                            "total": total_species,
-                            "limit": display_limit
-                        })
-                        self.send_response(200)
+                        "limit": display_limit
+                    })
+                    self.send_response(200)
                 else:
                     self.send_response(404)
                     contents = Path('html/error.html').read_text()
 
             except Exception as e:
-            self.send_response(500)
-            contents = f"<h1>Internal Error: {e}</h1>"
+                contents = f"<h1>Internal Error: {e}</h1>"
+                self.send_response(500)
 
 
         elif path == "/karyotype":
             params = parse_qs(parsed_url.query)
             species = params.get('species', [''])[0]
-            is_json = params.get('json', ['0'])[0] == '1'
 
             if not species:
                 self.send_response(404)
@@ -97,32 +81,21 @@ class GenomeHandler(http.server.BaseHTTPRequestHandler):
 
                 try:
                     response = requests.get(url, headers={"Content-Type": "application/json"})
+
                     if response.status_code == 200:
                         data = response.json()
+
                         karyotypes = data.get('karyotype', [])
 
-                        result_data = {
-                            "species": species,
-                            "karyotype": karyotypes
-                        }
+                        karyotype_html = ""
+                        for chromo in karyotypes:
+                            karyotype_html += f"<li>{chromo}</li>"
 
-                        if is_json:
-                            # MODE A: REST API (JSON)
-
-                            self.send_response(200)
-                            contents = json.dumps(result_data)
-
-                        else:
-                            # MODE B: WEB SERVER (HTML)
-                            karyotype_html = ""
-                            for chromo in karyotypes:
-                                karyotype_html += f"<li>{chromo}</li>"
-
-                            template = read_html_file("karyotype.html")
-                            contents = template.render(info={
-                                "list": karyotype_html
-                            })
-                            self.send_response(200)
+                        template = read_html_file("karyotype.html")
+                        contents = template.render(info={
+                            "list": karyotype_html
+                        })
+                        self.send_response(200)
                     else:
                         self.send_response(404)
                         contents = Path('html/error.html').read_text()
@@ -389,13 +362,7 @@ class GenomeHandler(http.server.BaseHTTPRequestHandler):
 
             self.send_response(404)
 
-
-        if contents.startswith('{') or contents.startswith('['):
-            ctype = 'application/json'
-        else:
-            ctype = 'text/html'
-
-        self.send_header('Content-Type', ctype)
+        self.send_header('Content-Type', 'text/html')
         self.send_header('Content-Length', len(str.encode(contents)))
         self.end_headers()
         self.wfile.write(str.encode(contents))
