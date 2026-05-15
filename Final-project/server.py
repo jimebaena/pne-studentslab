@@ -63,7 +63,6 @@ class GenomeHandler(http.server.BaseHTTPRequestHandler):
                         contents = json.dumps(result_data)
                     else:
                         # MODE B: HTML Response
-                        # We build the <li> tags for the template
                         especies_html = ""
                         for n in names:
                             especies_html += f"<li>{n}</li>"
@@ -80,8 +79,8 @@ class GenomeHandler(http.server.BaseHTTPRequestHandler):
                     contents = Path('html/error.html').read_text()
 
             except Exception as e:
-            self.send_response(500)
-            contents = f"<h1>Internal Error: {e}</h1>"
+                self.send_response(500)
+                contents = f"<h1>Internal Error: {e}</h1>"
 
 
         elif path == "/karyotype":
@@ -107,13 +106,11 @@ class GenomeHandler(http.server.BaseHTTPRequestHandler):
                         }
 
                         if is_json:
-                            # MODE A: REST API (JSON)
 
                             self.send_response(200)
                             contents = json.dumps(result_data)
 
                         else:
-                            # MODE B: WEB SERVER (HTML)
                             karyotype_html = ""
                             for chromo in karyotypes:
                                 karyotype_html += f"<li>{chromo}</li>"
@@ -136,6 +133,7 @@ class GenomeHandler(http.server.BaseHTTPRequestHandler):
             params = parse_qs(parsed_url.query)
             species = params.get('species', [''])[0]
             chromo = params.get('chromo', [''])[0]
+            is_json = params.get('json', ['0'])[0] == '1'
 
             if not species or not chromo:
                 self.send_response(404)
@@ -157,11 +155,19 @@ class GenomeHandler(http.server.BaseHTTPRequestHandler):
                                 found_length = region.get('length')
 
                         if found_length != "":
-                            template = read_html_file("chromolength.html")
-                            contents = template.render(info={
-                                "length": found_length
-                            })
-                            self.send_response(200)
+                            if is_json:
+                                self.send_response(200)
+                                contents = json.dumps({
+                                    "species": species,
+                                    "chromo": chromo,
+                                    "length": found_length
+                                })
+                            else:
+                                template = read_html_file("chromolength.html")
+                                contents = template.render(info={
+                                    "length": found_length
+                                })
+                                self.send_response(200)
                         else:
                             self.send_response(404)
                             contents = Path('html/error.html').read_text()
@@ -177,6 +183,7 @@ class GenomeHandler(http.server.BaseHTTPRequestHandler):
         elif path == "/geneLookup":
             params = parse_qs(parsed_url.query)
             gene_name = params.get('gene', [''])[0]
+            is_json = params.get('json', ['0'])[0] == '1'
 
             if not gene_name:
                 self.send_response(404)
@@ -189,15 +196,21 @@ class GenomeHandler(http.server.BaseHTTPRequestHandler):
 
                     if response.status_code == 200:
                         data = response.json()
-
                         ensembl_id = data.get('id')
+                        if is_json:
+                            self.send_response(200)
+                            contents = json.dumps({
+                                "gene": gene_name,
+                                "id": ensembl_id
+                            })
+                        else:
+                            template = read_html_file("genelookup.html")
+                            contents = template.render(info={
+                                "gene": gene_name,
+                                "id": ensembl_id
+                            })
+                            self.send_response(200)
 
-                        template = read_html_file("genelookup.html")
-                        contents = template.render(info={
-                            "gene": gene_name,
-                            "id": ensembl_id
-                        })
-                        self.send_response(200)
                     else:
                         self.send_response(404)
                         contents = Path('html/error.html').read_text()
@@ -209,6 +222,7 @@ class GenomeHandler(http.server.BaseHTTPRequestHandler):
         elif path == "/geneSeq":
             params = parse_qs(parsed_url.query)
             gene_name = params.get('gene', [''])[0]
+            is_json = params.get('json', ['0'])[0] == '1'
 
             if not gene_name:
                 self.send_response(404)
@@ -227,12 +241,20 @@ class GenomeHandler(http.server.BaseHTTPRequestHandler):
                         response2 = requests.get(url2, headers={"Content-Type": "application/json"})
                         data2 = response2.json()
                         seq = data2.get("seq")
-                        template = read_html_file("geneseq.html")
-                        contents = template.render(info={
-                            "gene": gene_name,
-                            "seq": seq
-                        })
-                        self.send_response(200)
+                        if is_json:
+                            self.send_response(200)
+                            contents = json.dumps({
+                                "gene": gene_name,
+                                "id": ensembl_id,
+                                "seq": seq
+                            })
+                        else:
+                            template = read_html_file("geneseq.html")
+                            contents = template.render(info={
+                                "gene": gene_name,
+                                "seq": seq
+                            })
+                            self.send_response(200)
 
                     else:
                         self.send_response(404)
@@ -245,6 +267,7 @@ class GenomeHandler(http.server.BaseHTTPRequestHandler):
         elif path == "/geneInfo":
             params = parse_qs(parsed_url.query)
             gene_name = params.get('gene', [''])[0]
+            is_json = params.get('json', ['0'])[0] == '1'
 
             if not gene_name:
                 self.send_response(404)
@@ -269,16 +292,27 @@ class GenomeHandler(http.server.BaseHTTPRequestHandler):
                         chr_name = data2.get("seq_region_name")
                         length = int(end) - int(start)
 
-                        template = read_html_file("geneinfo.html")
-                        contents = template.render(info={
-                            "gene_name": gene_name,
-                            "chr_name": chr_name,
-                            "id": identifier,
-                            "start": start,
-                            "end": end,
-                            "length": length
-                        })
-                        self.send_response(200)
+                        if is_json:
+                            self.send_response(200)
+                            contents = json.dumps({
+                                "gene_name": gene_name,
+                                "chr_name": chr_name,
+                                "id": identifier,
+                                "start": start,
+                                "end": end,
+                                "length": length
+                            })
+                        else:
+                            template = read_html_file("geneinfo.html")
+                            contents = template.render(info={
+                                "gene_name": gene_name,
+                                "chr_name": chr_name,
+                                "id": identifier,
+                                "start": start,
+                                "end": end,
+                                "length": length
+                            })
+                            self.send_response(200)
 
                     else:
                         self.send_response(404)
@@ -291,6 +325,7 @@ class GenomeHandler(http.server.BaseHTTPRequestHandler):
         elif path == "/geneCalc":
             params = parse_qs(parsed_url.query)
             gene_name = params.get('gene', [''])[0]
+            is_json = params.get('json', ['0'])[0] == '1'
 
             if not gene_name:
                 self.send_response(404)
@@ -320,16 +355,27 @@ class GenomeHandler(http.server.BaseHTTPRequestHandler):
                         cytosine = round((bases["C"] / length) * 100, 2)
                         guanine = round((bases["G"] / length) * 100, 2)
 
-                        template = read_html_file("genecalc.html")
-                        contents = template.render(info={
-                            "gene": gene_name,
-                            "length": length,
-                            "adenine": adenine,
-                            "thymine": thymine,
-                            "cytosine": cytosine,
-                            "guanine": guanine
-                        })
-                        self.send_response(200)
+                        if is_json:
+                            self.send_response(200)
+                            contents = json.dumps({
+                                "gene": gene_name,
+                                "length": length,
+                                "adenine": adenine,
+                                "thymine": thymine,
+                                "cytosine": cytosine,
+                                "guanine": guanine
+                            })
+                        else:
+                            template = read_html_file("genecalc.html")
+                            contents = template.render(info={
+                                "gene": gene_name,
+                                "length": length,
+                                "adenine": adenine,
+                                "thymine": thymine,
+                                "cytosine": cytosine,
+                                "guanine": guanine
+                            })
+                            self.send_response(200)
 
                     else:
                         self.send_response(404)
@@ -344,6 +390,7 @@ class GenomeHandler(http.server.BaseHTTPRequestHandler):
             chromo = params.get('chromo', [''])[0]
             start = params.get('start', [''])[0]
             end = params.get('end', [''])[0]
+            is_json = params.get('json', ['0'])[0] == '1'
 
             if not chromo or not start or not end:
                 self.send_response(404)
@@ -357,21 +404,34 @@ class GenomeHandler(http.server.BaseHTTPRequestHandler):
                     if response.status_code == 200:
                         data = response.json()
 
-                        gene_names = []
+                        raw_gene_list = []
                         for dic in data:
-                            gene_names.append({dic.get("external_name", "No Name"): dic.get("id")})
+                            name = dic.get("external_name", "No Name")
+                            identifier = dic.get("id")
+                            raw_gene_list.append({
+                                "name": name,
+                                "id": identifier
+                            })
 
-                        genes_html = ""
-                        for dic in gene_names:
-                            for k, v in dic.items():
-                                genes_html += f"<li>{k}: {v}</li>"
+                        if is_json:
+                            self.send_response(200)
+                            contents = json.dumps({
+                                "chromo": chromo,
+                                "start": start,
+                                "end": end,
+                                "genes": raw_gene_list
+                            })
+                        else:
+                            genes_html = ""
+                            for item in raw_gene_list:
+                                genes_html += f"<li>{item['name']}: {item['id']}</li>"
 
-                        template = read_html_file("geneList.html")
-                        contents = template.render(info={
-                            "genes_names": genes_html,
-                            "chromo": chromo
-                        })
-                        self.send_response(200)
+                            template = read_html_file("geneList.html")
+                            contents = template.render(info={
+                                "genes_names": genes_html,
+                                "chromo": chromo
+                            })
+                            self.send_response(200)
 
                     else:
                         self.send_response(404)
@@ -406,3 +466,5 @@ with socketserver.TCPServer(("", PORT), GenomeHandler) as httpd:
         httpd.serve_forever()
     except KeyboardInterrupt:
         httpd.server_close()
+
+
