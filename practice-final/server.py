@@ -477,6 +477,89 @@ class GenomeHandler(http.server.BaseHTTPRequestHandler):
                     self.send_response(500)
                     contents = f"<h1>Internal Error: {e}</h1>"
 
+        elif path == "/proteinMapping":
+            params = parse_qs(parsed_url.query)
+            protein_id = params.get('protein', [''])[0]
+
+            if not protein_id:
+                self.send_response(404)
+                contents = Path('html/error.html').read_text()
+            else:
+                url = f"https://rest.ensembl.org/xrefs/symbol/homo_sapiens/{protein_id}"
+
+                try:
+                    response = requests.get(url, headers={"Content-Type": "application/json"})
+
+                    if response.status_code == 200:
+                        data = response.json()
+                        if len(data) > 0:
+                            dic = data[0]
+                            ensembl_id = dic.get("id")
+
+                            template = read_html_file("protein.html")
+                            contents = template.render(info={
+                                "protein": protein_id,
+                                "id": ensembl_id
+                            })
+                            self.send_response(200)
+                        else:
+                            self.send_response(404)
+                            contents = Path('html/error.html').read_text()
+
+                    else:
+                        self.send_response(404)
+                        contents = Path('html/error.html').read_text()
+
+                except Exception as e:
+                    self.send_response(500)
+                    contents = f"<h1>Internal Error: {e}</h1>"
+
+        elif path == "/chromosomeStats":
+            params = parse_qs(parsed_url.query)
+            species = params.get('species', [''])[0]
+            chromo = params.get('chromo', [''])[0]
+
+            if not chromo or not species:
+                self.send_response(404)
+                contents = Path('html/error.html').read_text()
+            else:
+                url = f"https://rest.ensembl.org/overlap/region/{species}/{chromo}:1-5000000?feature=gene"
+
+                try:
+                    response = requests.get(url, headers={"Content-Type": "application/json"})
+
+                    if response.status_code == 200:
+                        data = response.json()
+
+                        genes_count = 0
+                        total_length = 0
+
+                        for dic in data:
+                            gen_length = int(dic.get("end")) - int(dic.get("start"))
+                            genes_count += 1
+                            total_length += gen_length
+
+                        if genes_count > 0:
+                            average_length = round(total_length / genes_count, 2)
+                        else:
+                            average_length = 0
+
+                        template = read_html_file("chromostats.html")
+                        contents = template.render(info={
+                            "species": species,
+                            "chromo": chromo,
+                            "total_genes": genes_count,
+                            "average_length": average_length
+                        })
+                        self.send_response(200)
+
+                    else:
+                        self.send_response(404)
+                        contents = Path('html/error.html').read_text()
+
+                except Exception as e:
+                    self.send_response(500)
+                    contents = f"<h1>Internal Error: {e}</h1>"
         else:
             try:
                 contents = Path('html/error.html').read_text()

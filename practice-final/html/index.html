@@ -74,5 +74,19 @@
       <br><br>
         <input type="submit" value="Send"/>
     </form>
+    <p>8) Protein IDs</p>
+    <form action="/proteinMapping" method="get">
+      Protein ID:  <input type="text" name="protein">
+      <br><br>
+        <input type="submit" value="Send"/>
+    </form>
+    <p>8) Length genes in a specific chromosome</p>
+    <form action="/chromosomeStats" method="get">
+      Enter the specie:  <input type="text" name="species">
+      <br><br>
+      Enter a chromosome:  <input type="text" name="chromo">
+      <br><br>
+        <input type="submit" value="Send"/>
+    </form>
   </body>
 </html>
